@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VivaVerse AI</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#090d1b;color:#f4f5ff;
+ font-family:Arial,sans-serif;
+}
+header{
+ padding:22px 7%;display:flex;justify-content:space-between;
+ align-items:center;border-bottom:1px solid #252b43;
+}
+.logo{font-size:23px;font-weight:bold;color:#b9a3ff}
+.tag{font-size:12px;color:#67e8c4}
+.layout{
+ display:grid;grid-template-columns:220px 1fr;
+ gap:24px;max-width:1150px;margin:30px auto;padding:0 20px;
+}
+aside,.card{
+ background:#12182a;border:1px solid #252d48;
+ border-radius:18px;padding:22px;
+}
+aside button{
+ width:100%;text-align:left;margin:7px 0;
+ background:transparent;color:#c4cbe0;
+}
+button,select,textarea{
+ font:inherit;border-radius:10px;padding:13px;border:1px solid #343c5c;
+}
+button{cursor:pointer}
+.active,.primary{
+ background:linear-gradient(110deg,#7c5cff,#4b8cff);
+ color:white;border:0;font-weight:bold;
+}
+h1{font-size:32px;margin-bottom:8px}
+.muted{color:#9da8c5;line-height:1.6}
+.cards{
+ display:grid;grid-template-columns:repeat(3,1fr);
+ gap:14px;margin:22px 0;
+}
+.stat{background:#171f35;border-radius:14px;padding:18px}
+.stat strong{display:block;font-size:25px;color:#b9a3ff;margin-bottom:7px}
+select,textarea{width:100%;background:#0c1222;color:white;margin:8px 0 16px}
+textarea{min-height:115px;resize:vertical}
+label{display:block;color:#cbd3ed;font-size:14px;margin-top:8px}
+.primary{width:100%;margin-top:8px}
+.progress{height:8px;background:#28304a;border-radius:9px;overflow:hidden}
+#bar{height:100%;width:0;background:#65e9c1;transition:width .3s}
+#question{font-size:21px;line-height:1.5}
+#feedback{line-height:1.7;color:#a7f3d0}
+.pill{color:#a9b5d5;font-size:12px}
+@media(max-width:700px){
+ .layout{grid-template-columns:1fr}
+ aside{display:none}
+ .cards{grid-template-columns:1fr}
+ h1{font-size:27px}
+}
+</style>
+</head>
+
+<body>
+<header>
+ <div class="logo">✦ VivaVerse AI</div>
+ <div class="tag">● PRACTICE MODE</div>
+</header>
+
+<div class="layout">
+<aside>
+ <h3>Workspace</h3>
+ <p>✦ Dashboard</p>
+ <p>◎ Mock Viva</p>
+ <p>▤ Performance</p>
+ <p>◈ Study Practice</p>
+ <hr style="border-color:#28304a">
+ <p class="muted">Your personal viva training space.</p>
+</aside>
+
+<main>
+ <div class="card">
+  <span class="pill">AI LEARNING STUDIO / HOME</span>
+  <h1>Own your next <span style="color:#ad98ff">Viva.</span></h1>
+  <p class="muted">Practice smarter. Explain better. Build confidence.</p>
+
+  <div class="cards">
+   <div class="stat"><strong id="total">0</strong>Questions attempted</div>
+   <div class="stat"><strong id="score">--</strong>Latest score</div>
+   <div class="stat"><strong id="level">Beginner</strong>Your level</div>
+  </div>
+
+  <label>Choose subject</label>
+  <select id="subject">
+   <option>Python</option>
+   <option>Java</option>
+   <option>DBMS</option>
+   <option>Computer Networks</option>
+   <option>Artificial Intelligence</option>
+  </select>
+
+  <label>Difficulty</label>
+  <select id="difficulty">
+   <option>Easy</option>
+   <option selected>Medium</option>
+   <option>Hard</option>
+  </select>
+
+  <button class="primary" onclick="start()">Start Mock Viva →</button>
+ </div>
+
+ <div class="card" style="margin-top:20px">
+  <div style="display:flex;justify-content:space-between;gap:10px">
+   <span class="pill" id="counter">READY TO START</span>
+   <span class="pill" id="percent">0% COMPLETE</span>
+  </div>
+  <div class="progress" style="margin:14px 0 22px">
+   <div id="bar"></div>
+  </div>
+
+  <h2>🎯 Your Viva Challenge</h2>
+  <p id="question" class="muted">Choose a subject and click Start Mock Viva.</p>
+
+  <label>Your answer</label>
+  <textarea id="answer" placeholder="Explain your answer here..."></textarea>
+  <button class="primary" onclick="submitAnswer()">Submit & Evaluate</button>
+  <div id="feedback"></div>
+  <button id="next" onclick="nextQuestion()" style="display:none;width:100%;margin-top:12px;background:#202a43;color:white">
+   Next Question →
+  </button>
+ </div>
+</main>
+</div>
+
+<script>
+const bank = {
+ Python:[
+  ["What is Python?","Python is a high-level, interpreted programming language."],
+  ["What is a variable?","A variable is a name that refers to a value."],
+  ["What is a function?","A function is a reusable block of code."],
+  ["What is a list?","A list is an ordered, mutable collection."],
+  ["What is a dictionary?","A dictionary stores key-value pairs."]
+ ],
+ Java:[
+  ["What is Java?","Java is a class-based, object-oriented programming language."],
+  ["What is a class?","A class is a blueprint for creating objects."],
+  ["What is inheritance?","Inheritance allows a class to acquire features of another class."],
+  ["What is polymorphism?","Polymorphism allows one interface to have different implementations."],
+  ["What is an object?","An object is an instance of a class."]
+ ],
+ DBMS:[
+  ["What is DBMS?","DBMS is software used to create and manage databases."],
+  ["What is a primary key?","A primary key uniquely identifies each record in a table."],
+  ["What is SQL?","SQL is used to query and manage relational databases."],
+  ["What is a foreign key?","A foreign key links related tables."],
+  ["What is normalization?","Normalization organizes tables to reduce redundancy."]
+ ],
+ "Computer Networks":[
+  ["What is a computer network?","A computer network connects devices to share data and resources."],
+  ["What is an IP address?","An IP address identifies a device on an IP network."],
+  ["What is TCP?","TCP is a reliable, connection-oriented transport protocol."],
+  ["What is DNS?","DNS translates domain names into IP addresses."],
+  ["What is HTTP?","HTTP is a protocol used to transfer web resources."]
+ ],
+ "Artificial Intelligence":[
+  ["What is AI?","AI enables machines to perform tasks that normally require human intelligence."],
+  ["What is machine learning?","Machine learning lets systems learn patterns from data."],
+  ["What is a dataset?","A dataset is a collection of data used for analysis or training."],
+  ["What is NLP?","NLP helps computers process and understand human language."],
+  ["What is a neural network?","A neural network is a model inspired by interconnected biological neurons."]
+ ]
+};
+
+let questions=[], index=0, attempts=0, latest=0;
+
+function start(){
+ const subject=document.getElementById("subject").value;
+ const difficulty=document.getElementById("difficulty").value;
+ questions=[...bank[subject]];
+ if(difficulty==="Hard") questions.reverse();
+ index=0;
+ document.getElementById("feedback").textContent="";
+ document.getElementById("answer").value="";
+ document.getElementById("next").style.display="none";
+ showQuestion();
+}
+
+function showQuestion(){
+ document.getElementById("question").textContent=
+ "Q"+(index+1)+". "+questions[index][0];
+ document.getElementById("counter").textContent=
+ "QUESTION "+(index+1)+" OF "+questions.length;
+ document.getElementById("percent").textContent=
+ Math.round(index/questions.length*100)+"% COMPLETE";
+ document.getElementById("bar").style.width=
+ (index/questions.length*100)+"%";
+ document.getElementById("feedback").textContent="";
+ document.getElementById("answer").value="";
+ document.getElementById("next").style.display="none";
+}
+
+function submitAnswer(){
+ const answer=document.getElementById("answer").value.trim();
+ if(!answer){
+  document.getElementById("feedback").textContent="Please enter your answer first.";
+  return;
+ }
+
+ const words=answer.split(/\s+/).filter(Boolean);
+ const reference=questions[index][1];
+ let score=0;
+ if(words.length>=5) score=3;
+ if(words.length>=10) score=5;
+ if(words.length>=15) score=7;
+ const relevant=reference.toLowerCase().split(/\W+/)
+ .filter(w=>w.length>3 && answer.toLowerCase().includes(w));
+ score=Math.min(10,score+relevant.length);
+
+ attempts++;
+ latest=score*10;
+ document.getElementById("total").textContent=attempts;
+ document.getElementById("score").textContent=latest+"/100";
+ document.getElementById("level").textContent=
+ latest>=70?"Improving":"Beginner";
+
+ document.getElementById("feedback").innerHTML=
+ "<h3>Practice Feedback: "+score+"/10</h3>"+
+ "<p>"+(score>=7?"Good attempt!": "Keep practising and make your explanation clearer.")+"</p>"+
+ "<b>Reference answer:</b> "+reference+
+ "<p>Tip: Explain the definition and include an example when possible.</p>";
+
+ document.getElementById("next").style.display="block";
+ document.getElementById("next").textContent=
+ index===questions.length-1?"Finish Viva ✓":"Next Question →";
+}
+
+function nextQuestion(){
+ if(index<questions.length-1){
+  index++;
+  showQuestion();
+ } else {
+  document.getElementById("question").textContent="🎉 Mock Viva Completed!";
+  document.getElementById("counter").textContent="SESSION COMPLETE";
+  document.getElementById("percent").textContent="100% COMPLETE";
+  document.getElementById("bar").style.width="100%";
+  document.getElementById("feedback").textContent=
+  "Great work! Practise again to improve your answers.";
+  document.getElementById("next").style.display="none";
+ }
+}
+</script>
+</body>
+</html>
